@@ -4,10 +4,12 @@ jQuery(document).ready(function() {
     /*
         Background slideshow
     */
+    config=Config.Config();
+    settings=Config.Settings();
 	$('.banner-area').backstretch([
-	                     "/PTC/apps/coming-soon/user/static/images/backgrounds/1.jpg"
-	                   , "/PTC/apps/coming-soon/user/static/images/backgrounds/2.jpg"
-	                   , "/PTC/apps/coming-soon/user/static/images/backgrounds/3.jpg"
+	                     config.base_url+"apps/"+settings.app+"/user/static/images/backgrounds/1.jpg"
+	                   , config.base_url+"apps/"+settings.app+"/user/static/images/backgrounds/2.jpg"
+	                   , config.base_url+"apps/"+settings.app+"/user/static/images/backgrounds/3.jpg"
 	                  ], {duration: 3000, fade: 750});
 					  
     

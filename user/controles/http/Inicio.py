@@ -4,10 +4,10 @@ from modulos.controlador import Controlador
 from Controladores.http.default import default 
 
 class Inicio(default):
-	def __init__(self,data):
+	def __init__(self,data,headers=None):
 
-		default.__init__(self,data)
-		
+		default.__init__(self,data,headers)
+	
 
 		self.vista="index"
 		

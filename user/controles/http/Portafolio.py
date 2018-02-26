@@ -3,9 +3,9 @@ from modulos.controlador import Controlador
 
 
 class Portafolio(Controlador):
-	def __init__(self,data):
+	def __init__(self,data,headers=None):
 
-		Controlador.__init__(self,data)
+		Controlador.__init__(self,data,headers)
 
 		
 		
@@ -36,12 +36,12 @@ class Portafolio(Controlador):
 		
 		self.add_vista("divi")
 		self.servir()
+	def divi_front(self):
+		
+		self.add_vista("divi-front")
+		self.servir()
 
-	def datos(self):
-		self.HEADERS.set_headers({"Content-type":"text/plain\n"})
-		self.HEADERS.show()
-		from modulos.ztec.zred import js_data
-		js_data({"hola":"mundo"})
+	
 	
 
 

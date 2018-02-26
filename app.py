@@ -33,10 +33,12 @@ class app(object):
 			def __setitem__(self,clave,valor):	
 					self.diccionario[clave]=valor
 
-		def __init__(self,padre):
+		def __init__(self,padre,headers=None):
 			self.parent=padre
 			self.root=padre.root
+			self.HEADERS=headers
 			self.__path__=self.parent.__path__+"/admin/"
+			
 			
 			
 			self.modelos=self.modelos(self)
@@ -51,12 +53,16 @@ class app(object):
 			
 			class http(object):
 				"""docstring for http"""
-				def __init__(self, padre):
+				def __init__(self, padre,headers=None):
 					self.parent=padre
+					self.HEADERS=headers
+
+
 
 
 					self.root=padre.root
 					self.__path__=self.parent.__path__+self.root.admin.routes.http_folder
+
 					
 
 
@@ -66,18 +72,21 @@ class app(object):
 				def __call__(self,data):
 
 					controladores=self.root.admin.settings.http
-					
 
 					
-
 
 					
 					if data["control"] in controladores:
 
 
+
 						control=imp.load_source("",self.__path__+data["control"]+".py")
 						
-						exec("ncontrol=control."+data["control"]+"(data)")
+						exec("ncontrol=control."+data["control"]+"(data,self.HEADERS)")
+
+						
+
+
 
 
 
@@ -86,7 +95,8 @@ class app(object):
 
 
 
-							metodo=gringolizar(data["metodo"])
+							metodo=gringolizar(data["metodo"],"_")
+
 
 							
 							
@@ -94,12 +104,16 @@ class app(object):
 
 							if  metodo in dir(ncontrol):
 								exec("ncontrol."+metodo+"()")
+
+
 							else:
 								exec("ncontrol.metodo_desconocido()")
 					
 					elif data["control"]=="Plugin":
 						from config import config
 						import os
+
+
 						for plugin in data["model"]["main"].obtenerFilas("Plugins"):
 							
 
@@ -112,6 +126,7 @@ class app(object):
 								
 
 								exec("ncontrol=control.Plugin(data)")
+								ncontrol.HEADERS=self.HEADERS
 
 
 								if data["args"][0].replace("-","_") in dir(ncontrol):
@@ -127,18 +142,22 @@ class app(object):
 					elif data["control"]==None:
 						
 						
+						
 						control=imp.load_source("",self.__path__+self.root.admin.settings.controller+".py")
-						exec("ncontrol=control."+self.root.admin.settings.controller+"(data)")
+						exec("ncontrol=control."+self.root.admin.settings.controller+"(data,self.HEADERS)")
+						ncontrol.HEADERS=self.HEADERS
+
 					elif data["control"]!=None:
 						control=imp.load_source("",self.__path__+self.root.admin.settings.controller+".py")
-						exec("ncontrol=control."+self.root.admin.settings.controller+"(data)")
+						exec("ncontrol=control."+self.root.admin.settings.controller+"(data,self.HEADERS)")
+						
+
 						if data["control"] in dir(ncontrol):
+							
 							exec("ncontrol."+data["control"]+"()")
 						else:
+
 							ncontrol.metodo_desconocido()
-
-	
-
 
 
 			class websockets(object):
@@ -153,9 +172,10 @@ class app(object):
 
 			class custom_http(object):
 				"""docstring for custom_http"""
-				def __init__(self,padre):
+				def __init__(self,padre,headers=None):
 					self.parent=padre
 					self.root=padre.root
+					self.HEADERS=headers
 				def __call__(self,data):
 					controladores=self.root.admin.settings.custom_http
 					if data["control"] in  controladores:
@@ -172,18 +192,23 @@ class app(object):
 					
 					
 					
-			def __init__(self,padre):
+			def __init__(self,padre,headers=None):
 				self.parent=padre
 				self.root=padre.root
 				self.__path__=__file__[:__file__.rfind("/")]+"/user/controles/"
-				self.http=self.http(self)
 
-				self.custom_http=self.custom_http(self)
+				self.http=self.http(self,headers)
+				
+
+
+				self.custom_http=self.custom_http(self,headers)
+				
 				self.websockets=self.websockets(self)
 				self.custom_websockets=self.custom_websockets(self)				
 
 				
 			def __call__(self,data):
+
 				self.http(data)
 				self.custom_http(data)
 				self.websockets(data)
@@ -191,21 +216,37 @@ class app(object):
 
 
 				
-		def __init__(self,padre):
+		def __init__(self,padre,headers=None):
 			
 			self.parent=padre
 			self.root=padre.root
-			self.cnt=self.cnt(self)
+			self.HEADERS=headers
+			
+
+			self.cnt=self.cnt(self,headers)
+
+
+
+			
 			self.__url__=config.base_url+config.apps_folder+self.root.admin.settings.app+"/user/"
 			
 			pass
 
 
 
-	def __init__(self):
+	def __init__(self,headers=None):
 		self.root=self
-		self.admin=self.admin(self)
-		self.user=self.user(self)
+
+		
+		self.HEADERS=headers
+
+
+		self.admin=self.admin(self,self.HEADERS)
+		
+		self.user=self.user(self,self.HEADERS)
+
+
+		
 		
 
 

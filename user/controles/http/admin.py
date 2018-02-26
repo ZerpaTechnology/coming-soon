@@ -6,18 +6,20 @@ import sys
 
 from Controladores.http.admin import preLoad
 
-def admin(data):
+def admin(data,headers=None):
 	
 
-	cnt=preLoad(data)
+	cnt=preLoad(data,headers)
 	
 
 	class Admin(cnt):
-		def __init__(self,data):
+		def __init__(self,data,headers=None):
 			
-			cnt.__init__(self,data)
-			if self.data["metodo"]==None and self.data["ajax"]==False:
+			cnt.__init__(self,data,headers)
+
+			if self.data["metodo"]==None and self.data["ajax"]==False and self.data["action"] not in config.hookNotActions:
 				self.servir()
+
 		def index(self):
 			self.servir()
 
@@ -27,4 +29,5 @@ def admin(data):
 			self.vista="licencias"
 			self.servir()
 
-	return Admin(data)
+
+	return Admin(data,headers)
